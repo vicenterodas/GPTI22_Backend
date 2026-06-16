@@ -9,6 +9,8 @@ Este es un prototipo funcional básico de una plataforma web centralizada para b
 
 ## Cómo Ejecutar
 
+Los endpoints están documentados en [DOCUMENTATION](./DOCUMENTATION.md).
+
 1. Asegúrate de tener Python 3.12 instalado.
    Entorno virtual para Linux/Ubuntu:
    ```
@@ -16,17 +18,21 @@ Este es un prototipo funcional básico de una plataforma web centralizada para b
    source venv/bin/activate
    ```
 
-
 2. Instala las dependencias del backend:
    ```
    pip install -r requirements.txt
    ```
 
-4. Ejecuta el backend:
+3. Ejecuta el backend:
    ```
    python app.py
    ```
    El backend correrá en http://127.0.0.1:5002
+
+4. Para llenar la database con datos mock:
+   ```
+   python populate_db.py
+   ```
 
 5. En otra terminal, ejecuta el frontend:
    ```
