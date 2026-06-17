@@ -1,3 +1,9 @@
+# Python cache
+__pycache__/
+*.pyc
+
+# Base de datos local (contiene usuarios, contraseñas hasheadas y tokens de sesión)
+ofertas.db
 *.db
 *.sqlite
 *.sqlite3

@@ -25,7 +25,7 @@ Los endpoints están documentados en [DOCUMENTATION](./DOCUMENTATION.md).
 
 3. Ejecuta el backend:
    ```
-   python app.py
+   python run.py
    ```
    El backend correrá en http://127.0.0.1:5002
 

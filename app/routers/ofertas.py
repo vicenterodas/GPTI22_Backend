@@ -2,10 +2,13 @@ import uuid
 from flask import Blueprint, request, jsonify
 from app.db import get_db_connection
 
+from app.auth import login_required
+
 ofertas_bp = Blueprint("ofertas", __name__, url_prefix="/ofertas")
 
 
 @ofertas_bp.route("", methods=["GET"])
+@login_required
 def get_ofertas():
     try:
         area = request.args.get("area")
