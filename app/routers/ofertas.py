@@ -1,16 +1,48 @@
 import uuid
+import unicodedata
 from flask import Blueprint, request, jsonify
 from app.db import get_db_connection
 
 from app.auth import login_required
+from app.scraper_sync import sync_scraper_offers
 
 ofertas_bp = Blueprint("ofertas", __name__, url_prefix="/ofertas")
+
+
+def normalize_search_text(value):
+    value = value or ""
+    normalized = unicodedata.normalize("NFKD", value)
+    ascii_value = normalized.encode("ascii", "ignore").decode("ascii")
+    return ascii_value.lower()
+
+
+def matches_search(row, search):
+    terms = normalize_search_text(search).split()
+    if not terms:
+        return True
+
+    searchable = normalize_search_text(" ".join([
+        row["titulo"] or "",
+        row["descripcion"] or "",
+        row["empresa"] or "",
+    ]))
+
+    return all(term in searchable for term in terms)
 
 
 @ofertas_bp.route("", methods=["GET"])
 @login_required
 def get_ofertas():
     try:
+        search = request.args.get("q") or request.args.get("query")
+        sync_scraper_offers(
+            query=search,
+            location=request.args.get("ubicacion"),
+            date_range=request.args.get("date_range"),
+            max_pages=request.args.get("max_pages"),
+            sources=request.args.get("sources"),
+        )
+
         area = request.args.get("area")
         modalidad = request.args.get("modalidad")
         ubicacion = request.args.get("ubicacion")
@@ -49,7 +81,9 @@ def get_ofertas():
         rows = conn.execute(query, params).fetchall()
         conn.close()
 
-        return jsonify([dict(r) for r in rows]), 200
+        offers = [dict(r) for r in rows if matches_search(r, search)]
+
+        return jsonify(offers), 200
 
     except Exception as e:
         return jsonify({

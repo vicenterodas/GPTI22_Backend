@@ -24,20 +24,36 @@ Endpoint de estado y bienvenida de la API.
 
 ### Descripción
 
-Obtiene todas las ofertas de prácticas con filtros opcionales.
+Sincroniza ofertas desde el scraper y luego obtiene las ofertas de prácticas
+guardadas en la base oficial con filtros opcionales.
+
+Requiere header de autenticación:
+
+```http
+Authorization: Bearer token
+```
+
+Antes de responder, este endpoint ejecuta el scraper. Por defecto busca
+`practica`, en todas las fuentes disponibles y hasta 3 páginas por fuente.
+Las ofertas nuevas se guardan evitando duplicados por `link`.
 
 ---
 
 ### 🔧 Query Params
 
-| Parámetro | Tipo   | Descripción                  |
-| --------- | ------ | ---------------------------- |
-| area      | string | Filtra por área              |
-| modalidad | string | Remota, híbrida o presencial |
-| ubicacion | string | Filtra por ubicación         |
-| nivel     | string | Nivel de práctica            |
-| empresa   | string | Filtra por empresa           |
-| activa    | 0/1    | Filtra ofertas activas       |
+| Parámetro  | Tipo   | Descripción                                      |
+| ---------- | ------ | ------------------------------------------------ |
+| q          | string | Texto que buscará el scraper y filtrará ofertas  |
+| query      | string | Alias de `q`                                     |
+| sources    | string | Fuentes del scraper separadas por coma           |
+| max_pages  | int    | Páginas máximas por fuente. Default: 3           |
+| date_range | string | Filtro de fecha para el scraper                  |
+| area       | string | Filtra por área/fuente en la base oficial        |
+| modalidad  | string | Remota, híbrida o presencial                     |
+| ubicacion  | string | Filtra por ubicación y se pasa al scraper        |
+| nivel      | string | Nivel de práctica                                |
+| empresa    | string | Filtra por empresa                               |
+| activa     | 0/1    | Filtra ofertas activas                           |
 
 ---
 
@@ -45,6 +61,10 @@ Obtiene todas las ofertas de prácticas con filtros opcionales.
 
 ```http
 GET /ofertas
+GET /ofertas?q=practica%20psicologia
+GET /ofertas?q=python&ubicacion=Santiago
+GET /ofertas?q=practica%20psicologia&sources=chiletrabajos,computrabajo
+GET /ofertas?q=practica%20psicologia&max_pages=5
 GET /ofertas?area=Data
 GET /ofertas?area=Ingeniería&modalidad=Remota
 GET /ofertas?activa=1
@@ -58,7 +78,7 @@ GET /ofertas?activa=1
 [
   {
     "id": "uuid",
-    "activa": true,
+    "activa": 1,
     "titulo": "Práctica Data Science",
     "empresa": "TechCorp",
     "descripcion": "Opcional",
@@ -132,8 +152,7 @@ Crea una nueva oferta de práctica.
 
 ```json
 {
-  "message": "Oferta creada correctamente",
-  "id": "uuid-generado"
+  "message": "Oferta creada correctamente"
 }
 ```
 

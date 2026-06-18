@@ -48,6 +48,7 @@ class ScrapeService:
         if not scraper:
             return {
                 "source": source,
+                "query": query,
                 "total_found": 0,
                 "new_offers_saved": 0,
                 "duplicates_skipped": 0,
@@ -69,6 +70,7 @@ class ScrapeService:
             errors.append(f"Scraping failed: {str(e)}")
             return {
                 "source": source,
+                "query": query,
                 "total_found": 0,
                 "new_offers_saved": 0,
                 "duplicates_skipped": 0,
@@ -100,6 +102,7 @@ class ScrapeService:
 
         return {
             "source": source,
+            "query": query,
             "total_found": len(offers),
             "new_offers_saved": new_offers,
             "duplicates_skipped": duplicates,
