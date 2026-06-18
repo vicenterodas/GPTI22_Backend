@@ -6,6 +6,7 @@ import os
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
 from fastapi.testclient import TestClient
 
 from app.config import settings
@@ -25,32 +26,26 @@ def pytest_configure(config):
     )
 
 
-@pytest.fixture(scope="session")
-def test_db():
+@pytest.fixture
+def db_session():
     """
-    Create a test database (in-memory SQLite).
+    Provide a clean in-memory database session for each test.
     """
-    engine = create_engine("sqlite:///:memory:")
+    engine = create_engine(
+        "sqlite://",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+    )
     Base.metadata.create_all(bind=engine)
     SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-    
-    yield SessionLocal()
-    
-    Base.metadata.drop_all(bind=engine)
 
-
-@pytest.fixture
-def db_session(test_db):
-    """
-    Provide a clean database session for each test.
-    """
-    # Start a transaction for this test
-    transaction = test_db.begin()
-    
-    yield test_db
-    
-    # Rollback to clean up
-    transaction.rollback()
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+        Base.metadata.drop_all(bind=engine)
+        engine.dispose()
 
 
 @pytest.fixture
