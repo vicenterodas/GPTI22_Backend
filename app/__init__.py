@@ -5,8 +5,9 @@ def create_app():
     app = Flask(__name__)
     CORS(
         app,
-        origins=["http://localhost:8001"],
-        allow_headers=["Content-Type", "Authorization"]
+        origins=["http://localhost:8001", "https://gpti22-practicas360.netlify.app"],
+        allow_headers=["Content-Type", "Authorization"],
+        methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"]
     )
 
     from app.routers.ofertas import ofertas_bp
